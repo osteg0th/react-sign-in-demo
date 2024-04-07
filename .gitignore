@@ -415,5 +415,6 @@ thumb
 sketch
 
 *.idea
+sql_server
 
 # End of https://www.toptal.com/developers/gitignore/api/csharp,react

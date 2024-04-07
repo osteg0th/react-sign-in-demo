@@ -12,12 +12,20 @@ namespace SignInDemo.Api.Controllers;
 public class AccountController : Controller
 {
     [HttpGet]
-    [Route("checkForbiddenDomain")]
-    public async Task<ActionResult> CheckForbiddenDomain([FromQuery] string email,
-        [FromServices] IOptions<IdentitySettings> options)
+    [Route("provide-email")]
+    public async Task<ActionResult> ProvideEmail([FromQuery] string email,
+        [FromServices] IOptions<IdentitySettings> options,
+        [FromServices] UserManager<User> userManager)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
         var isForbidden = options.Value.EmailDomainsBlacklist.Exists(email.Contains);
-        return Ok(isForbidden);
+        if (isForbidden)
+            return Ok(isForbidden);
+        var user = await userManager.FindByEmailAsync(email);
+        if (user is not null)
+            return Ok("Email alrady used");
+        return Ok();
     }
 
     [HttpPost]
